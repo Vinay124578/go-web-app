@@ -1,18 +1,15 @@
-# CICD using GitHub actions
+name: CI
 
-name: CI/CD
+on: 
+    push:
+        branches:
+            - main
+        paths-ignore:
+            - 'READEME.MD'
+            - 'helm/**'
 
-# Exclude the workflow to run on changes to the helm chart
-on:
-  push:
-    branches:
-      - main
-    paths-ignore:
-      - 'helm/**'
-      - 'k8s/**'
-      - 'README.md'
 
-jobs:
+jobs: 
 
   build:
     runs-on: ubuntu-latest
@@ -31,7 +28,7 @@ jobs:
 
     - name: Test
       run: go test ./...
-  
+
   code-quality:
     runs-on: ubuntu-latest
 
@@ -43,7 +40,7 @@ jobs:
       uses: golangci/golangci-lint-action@v6
       with:
         version: v1.56.2
-  
+
   push:
     runs-on: ubuntu-latest
 
@@ -68,8 +65,8 @@ jobs:
         context: .
         file: ./Dockerfile
         push: true
-        tags: ${{ secrets.DOCKERHUB_USERNAME }}/go-web-app:${{github.run_id}}
-
+        tags: ${{ secrets.DOCKERHUB_USERNAME }}/go-web-app:${{github.run_id}}   
+        
   update-newtag-in-helm-chart:
     runs-on: ubuntu-latest
 
